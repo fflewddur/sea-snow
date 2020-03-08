@@ -16,7 +16,6 @@ func main() {
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		snowing := false
 		testing := false
@@ -34,7 +33,14 @@ func main() {
 			Testing: testing,
 		}
 
-		err := tmpl.Execute(w, data)
+		tmpl, err := template.ParseFiles("templates/index.html")
+		if err != nil {
+			log.Println(err.Error())
+			http.Error(w, http.StatusText(500), 500)
+			return
+		}
+
+		err = tmpl.Execute(w, data)
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, http.StatusText(500), 500)
