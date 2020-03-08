@@ -15,6 +15,15 @@
   </head>
 
   <body>
-    <p>Yo.</p>
+      <h1>Is it snowing in Seattle?</h1>
+      {{if .Snowing}}
+      <p>Woah, it looks like it's snowing in Seattle!</p>
+      {{else}}
+      <p>Nope, it's almost certainly not snowing in Seattle.</p>
+      {{end}}
+
+      {{if.Testing}}
+      <p>(testing mode)</p>
+      {{end}}
   </body>
 </html>
