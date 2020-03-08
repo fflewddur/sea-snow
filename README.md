@@ -1,6 +1,6 @@
 # sea-snow
 
-This code powers [isitsnowinginseattle.org](https://isitsnowinginseattle.org).
+This code powers [isitsnowinginseattle.org](https://isitsnowinginseattle.org). It's a silly site and shouldn't be taken too seriously.
 
 ## License
 
