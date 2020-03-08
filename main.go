@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-// SnowData holds a summary of local weather conditions
+// SnowData holds a summary of local weather conditions.
 type SnowData struct {
 	Snowing bool
 	Testing bool
@@ -30,9 +30,10 @@ func main() {
 			testing = true
 		} else if params.Get("testNoSnow") != "" {
 			testing = true
+		} else {
+			cc := FetchCurrentConditions(cfg.WeatherAPIKey)
+			snowing = cc.Snowing()
 		}
-
-		FetchCurrentConditions(cfg.WeatherAPIKey)
 
 		data := SnowData{
 			Snowing: snowing,

@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// Config stores runtime configuration options for sea-snow
+// Config stores runtime configuration options for sea-snow.
 type Config struct {
 	Server struct {
 		Port string `yaml:"port"`
