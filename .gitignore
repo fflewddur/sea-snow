@@ -1,3 +1,6 @@
+# Config files (may contain secrets)
+/config.yml
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
