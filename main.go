@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -13,10 +14,13 @@ type SnowData struct {
 }
 
 func main() {
+	cfg := ReadConf()
+
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("request: %v\n", r.URL)
 		snowing := false
 		testing := false
 
@@ -27,6 +31,8 @@ func main() {
 		} else if params.Get("testNoSnow") != "" {
 			testing = true
 		}
+
+		FetchCurrentConditions(cfg.WeatherAPIKey)
 
 		data := SnowData{
 			Snowing: snowing,
@@ -47,7 +53,8 @@ func main() {
 		}
 	})
 
-	err := http.ListenAndServe(":9990", nil)
+	serverAndPort := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
+	err := http.ListenAndServe(serverAndPort, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
