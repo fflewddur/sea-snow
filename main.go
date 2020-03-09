@@ -16,11 +16,15 @@ type SnowData struct {
 func main() {
 	cfg := ReadConf()
 
+	conditions := make(chan CurrentConditions)
+	update := make(chan bool)
+
+	go UpdateAsNeeded(update, conditions, cfg.WeatherAPIKey)
+
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("request: %v\n", r.URL)
 		snowing := false
 		testing := false
 
@@ -31,7 +35,8 @@ func main() {
 		} else if params.Get("testNoSnow") != "" {
 			testing = true
 		} else {
-			cc := FetchCurrentConditions(cfg.WeatherAPIKey)
+			update <- true
+			cc := <-conditions
 			snowing = cc.Snowing()
 		}
 
@@ -58,5 +63,20 @@ func main() {
 	err := http.ListenAndServe(serverAndPort, nil)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+// UpdateAsNeeded handles requests for current weather conditions and returns the latest values it has.
+// If needed, it will check for updated conditions from the weather service.
+func UpdateAsNeeded(update <-chan bool, conditions chan<- CurrentConditions, apiKey string) {
+	var cc CurrentConditions
+	for {
+		select {
+		case <-update:
+			if cc.Expired() {
+				cc = FetchCurrentConditions(apiKey)
+			}
+			conditions <- cc
+		}
 	}
 }
