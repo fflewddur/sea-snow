@@ -1,31 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Is it snowing in Seattle?</title>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <title>Is it snowing in Seattle?</title>
 
-    <!-- Fonts to support Material Design -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="stylesheet" href="/static/style.css">
-  </head>
+  <!-- Fonts to support Material Design -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
 
-  <body>
-      <h1>Is it snowing in Seattle?</h1>
-      {{if .Snowing}}
-      <p class="snow">Woah, it looks like it's snowing in Seattle!</p>
-      {{else}}
-      <p class="nosnow">Nope, it's almost certainly not snowing in Seattle.</p>
-      {{end}}
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
 
-      {{if.Testing}}
-      <p class="testmode">(testing mode)</p>
-      {{end}}
-  </body>
+<body>
+  <canvas id="canvas"></canvas>
+
+  <h1>Is it snowing in Seattle?</h1>
+  {{if .Snowing}}
+  <p class="snow">Woah, it's snowing in Seattle!!</p>
+  {{else}}
+  <p class="nosnow">Nope, it doesn't look like it's snowing in Seattle.</p>
+  {{end}}
+
+  {{if.Testing}}
+  <p class="testmode">(testing mode)</p>
+  {{end}}
+
+  {{if .Snowing}}<script src="/static/snow.js" type="text/javascript"></script>{{end}}
+</body>
+
 </html>
