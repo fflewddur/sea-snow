@@ -25,38 +25,14 @@ func main() {
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		snowing := false
-		testing := false
+		data := currentWeather(r, update, conditions)
+		writeIndex(w, data)
+	})
 
-		params := r.URL.Query()
-		if params.Get("testSnow") != "" {
-			snowing = true
-			testing = true
-		} else if params.Get("testNoSnow") != "" {
-			testing = true
-		} else {
-			update <- true
-			cc := <-conditions
-			snowing = cc.Snowing()
-		}
-
-		data := SnowData{
-			Snowing: snowing,
-			Testing: testing,
-		}
-
-		tmpl, err := template.ParseFiles("templates/index.html")
-		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, http.StatusText(500), 500)
-			return
-		}
-
-		err = tmpl.Execute(w, data)
-		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, http.StatusText(500), 500)
-		}
+	http.HandleFunc("/api/update", func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("/api/update called")
+		data := currentWeather(r, update, conditions)
+		log.Printf("data: %v\n", data)
 	})
 
 	serverAndPort := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
@@ -78,5 +54,44 @@ func UpdateAsNeeded(update <-chan bool, conditions chan<- CurrentConditions, api
 			}
 			conditions <- cc
 		}
+	}
+}
+
+func currentWeather(r *http.Request, update chan<- bool, conditions <-chan CurrentConditions) SnowData {
+	snowing := false
+	testing := false
+
+	params := r.URL.Query()
+	if params.Get("testSnow") != "" {
+		snowing = true
+		testing = true
+	} else if params.Get("testNoSnow") != "" {
+		testing = true
+	} else {
+		update <- true
+		cc := <-conditions
+		snowing = cc.Snowing()
+	}
+
+	data := SnowData{
+		Snowing: snowing,
+		Testing: testing,
+	}
+
+	return data
+}
+
+func writeIndex(w http.ResponseWriter, data SnowData) {
+	tmpl, err := template.ParseFiles("templates/index.html")
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, http.StatusText(500), 500)
+		return
+	}
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		log.Println(err.Error())
+		http.Error(w, http.StatusText(500), 500)
 	}
 }
