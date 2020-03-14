@@ -1,0 +1,6 @@
+# Server configuration
+server:
+  host: "localhost"
+  port: 9990
+
+weather_api_key: "[API key from https://openweathermap.org/]"
