@@ -1,10 +1,12 @@
+// This falling snow effect is heavily based on https://codepen.io/loktar00/pen/CHpGo
+
 var refreshInterval = 1000 * 20, // refresh every 20 seconds
     flakes = [],
     canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d"),
-    flakeCount = 400,
-    mX = -100,
-    mY = -100,
+    flakeCount = 600,
+    mouseX = -100,
+    mouseY = -100,
     isSnowing = false
 
 canvas.width = window.innerWidth;
@@ -12,6 +14,23 @@ canvas.height = window.innerHeight;
 
 $(document).ready(function () {
     initSnow();
+
+    $('body').mousemove(function (e) {
+        mouseX = e.pageX;
+        mouseY = e.pageY;
+    });
+
+    $('body').mouseout(function (e) {
+        // If the mouse leaves the page, stop interacting with flakes
+        mouseX = -100;
+        mouseY = -100;
+    });
+
+    $(window).resize(function () {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    });
+
     if (isSnowing) {
         startSnow();
     }
@@ -46,6 +65,7 @@ function checkWeather() {
 })();
 
 function startSnow() {
+    resetFlakes();
     isSnowing = true;
     $('#canvas').show();
     snow();
@@ -53,19 +73,25 @@ function startSnow() {
 
 function stopSnow() {
     isSnowing = false;
-    $('#canvas').hide();
 }
 
 function snow() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var flakesAreFalling = false;
 
     for (var i = 0; i < flakeCount; i++) {
         var flake = flakes[i],
-            x = mX,
-            y = mY,
+            x = mouseX,
+            y = mouseY,
             minDist = 150,
             x2 = flake.x,
             y2 = flake.y;
+
+        // Let flakes finish falling before we stop the animation
+        if (!isSnowing && (flake.y >= canvas.height || flake.y <= -10)) {
+            continue;
+        }
+        flakesAreFalling = true;
 
         var dist = Math.sqrt((x2 - x) * (x2 - x) + (y2 - y) * (y2 - y))
 
@@ -90,10 +116,9 @@ function snow() {
         flake.y += flake.velY;
         flake.x += flake.velX;
 
-        if (flake.y >= canvas.height || flake.y <= 0) {
+        if (flake.y >= canvas.height) {
             reset(flake);
         }
-
 
         if (flake.x >= canvas.width || flake.x <= 0) {
             reset(flake);
@@ -103,16 +128,24 @@ function snow() {
         ctx.arc(flake.x, flake.y, flake.size, 0, Math.PI * 2);
         ctx.fill();
     }
-    if (isSnowing) {
+    if (flakesAreFalling) {
         requestAnimationFrame(snow);
+    } else if (!isSnowing) {
+        $('#canvas').hide();
     }
 };
 
+function resetFlakes() {
+    for (var i = 0; i < flakeCount; i++) {
+        reset(flakes[i])
+    }
+}
+
 function reset(flake) {
     flake.x = Math.floor(Math.random() * canvas.width);
-    flake.y = 0;
+    flake.y = -1 * Math.floor(Math.random() * canvas.height);
     flake.size = (Math.random() * 3) + 2;
-    flake.speed = (Math.random() * 1) + 0.5;
+    flake.speed = (Math.random() * 1) + 0.75;
     flake.velY = flake.speed;
     flake.velX = 0;
     flake.opacity = (Math.random() * 0.5) + 0.3;
@@ -120,33 +153,19 @@ function reset(flake) {
 
 function initSnow() {
     for (var i = 0; i < flakeCount; i++) {
-        var x = Math.floor(Math.random() * canvas.width),
-            y = Math.floor(Math.random() * canvas.height),
-            size = (Math.random() * 3) + 2,
-            speed = (Math.random() * 1) + 0.5,
-            opacity = (Math.random() * 0.5) + 0.3;
-
-        flakes.push({
-            speed: speed,
-            velY: speed,
-            velX: 0,
-            x: x,
-            y: y,
-            size: size,
+        flake = {
+            x: 0,
+            y: 0,
+            opacity: 0,
+            size: 0,
+            speed: 0,
             stepSize: (Math.random()) / 30,
             step: 0,
-            opacity: opacity
-        });
+            velX: 0,
+            velY: 0
+        }
+        reset(flake)
+        flakes.push(flake);
     }
     isSnowing = $('.snow').length > 0;
 };
-
-canvas.addEventListener("mousemove", function (e) {
-    mX = e.clientX,
-        mY = e.clientY
-});
-
-window.addEventListener("resize", function () {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-})
