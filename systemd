@@ -1,0 +1,13 @@
+[Unit]
+Description=sea-snow
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+User=[USER]
+WorkingDirectory=[INSTALL_DIR]
+ExecStart=[INSTALL_DIR/sea-snow]
+
+[Install]
+WantedBy=multi-user.target
