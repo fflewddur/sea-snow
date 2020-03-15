@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -11,6 +12,11 @@ import (
 type SnowData struct {
 	Snowing bool
 	Testing bool
+}
+
+type JsonResponse struct {
+	Success bool `json:"success"`
+	Snowing bool `json:"snowing"`
 }
 
 func main() {
@@ -30,9 +36,18 @@ func main() {
 	})
 
 	http.HandleFunc("/api/update", func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("/api/update called")
 		data := currentWeather(r, update, conditions)
-		log.Printf("data: %v\n", data)
+		response := JsonResponse{
+			Success: true,
+			Snowing: data.Snowing,
+		}
+		b, err := json.Marshal(response)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(b)
 	})
 
 	serverAndPort := fmt.Sprintf("%s:%s", cfg.Server.Host, cfg.Server.Port)
