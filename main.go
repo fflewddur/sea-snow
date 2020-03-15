@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 )
 
 // SnowData holds a summary of local weather conditions.
@@ -14,7 +17,8 @@ type SnowData struct {
 	Testing bool
 }
 
-type JsonResponse struct {
+// JSONResponse holds our... JSON response.
+type JSONResponse struct {
 	Success bool `json:"success"`
 	Snowing bool `json:"snowing"`
 }
@@ -22,6 +26,14 @@ type JsonResponse struct {
 func main() {
 	cfg := ReadConf()
 
+	test := flag.Bool("t", false, "test mode")
+
+	flag.Parse()
+
+	if *test {
+		log.Printf("Running in test mode")
+		rand.Seed(time.Now().UnixNano())
+	}
 	conditions := make(chan CurrentConditions)
 	update := make(chan bool)
 
@@ -32,14 +44,21 @@ func main() {
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		data := currentWeather(r, update, conditions)
+		if *test {
+			data.Testing = true
+			data.Snowing = testSnowing()
+		}
 		writeIndex(w, data)
 	})
 
 	http.HandleFunc("/api/update", func(w http.ResponseWriter, r *http.Request) {
 		data := currentWeather(r, update, conditions)
-		response := JsonResponse{
+		response := JSONResponse{
 			Success: true,
 			Snowing: data.Snowing,
+		}
+		if *test {
+			response.Snowing = testSnowing()
 		}
 		b, err := json.Marshal(response)
 		if err != nil {
@@ -109,4 +128,9 @@ func writeIndex(w http.ResponseWriter, data SnowData) {
 		log.Println(err.Error())
 		http.Error(w, http.StatusText(500), 500)
 	}
+}
+
+func testSnowing() bool {
+	n := rand.Intn(99)
+	return n < 50
 }
