@@ -25,7 +25,7 @@ func main() {
 	conditions := make(chan CurrentConditions)
 	update := make(chan bool)
 
-	go UpdateAsNeeded(update, conditions, cfg.WeatherAPIKey)
+	go fetchConditionsAsNeeded(update, conditions, cfg.WeatherAPIKey)
 
 	fs := http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
@@ -57,9 +57,9 @@ func main() {
 	}
 }
 
-// UpdateAsNeeded handles requests for current weather conditions and returns the latest values it has.
+// fetchConditionsAsNeeded handles requests for current weather conditions and returns the latest values it has.
 // If needed, it will check for updated conditions from the weather service.
-func UpdateAsNeeded(update <-chan bool, conditions chan<- CurrentConditions, apiKey string) {
+func fetchConditionsAsNeeded(update <-chan bool, conditions chan<- CurrentConditions, apiKey string) {
 	var cc CurrentConditions
 	for {
 		select {
