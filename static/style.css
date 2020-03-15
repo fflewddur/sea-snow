@@ -1,31 +1,33 @@
 body {
-    margin:0;
-    height:100%;
+    margin: 0;
+    height: 100%;
     padding: 20px;
     color: #ddd;
     background-color: #222;
-    font-family: "Roboto";
+    font-family: Roboto, Arial, Helvetica, sans-serif;
     font-weight: 400;
 }
 
 h1 {
     margin-top: 100px;
     text-align: center;
-    color: #bbb;
+    color: #ddd;
     font-weight: 300;
+    font-size: 60px;
     text-shadow: 0 0 10px #222;
 }
 
 .snow {
     margin-top: 60px;
-    font-size: 24px;
+    font-size: 36px;
     text-align: center;
     text-shadow: 0 0 10px #222;
+    animation: blinkingText 2.5s infinite;
 }
 
 .nosnow {
     margin-top: 60px;
-    font-size: 18px;
+    font-size: 24px;
     text-align: center;
 }
 
@@ -40,4 +42,12 @@ canvas{
     top: 0;
     left: 0;
     z-index: -1;
+}
+
+@keyframes blinkingText{
+    0%{     color: #ddd;    }
+    49%{    color: #ddd; }
+    70%{    color: transparent; }
+    90%{    color:transparent;  }
+    100%{   color: #ddd;    }
 }
