@@ -1,5 +1,7 @@
 # sea-snow
 
+[![Build Status](https://travis-ci.org/fflewddur/sea-snow.svg?branch=master)](https://travis-ci.org/fflewddur/sea-snow) [![codecov](https://codecov.io/gh/fflewddur/sea-snow/branch/master/graph/badge.svg)](https://codecov.io/gh/fflewddur/sea-snow) [![Go Report Card](https://goreportcard.com/badge/github.com/fflewddur/sea-snow)](https://goreportcard.com/report/github.com/fflewddur/sea-snow)
+
 This code powers [isitsnowinginseattle.org](https://isitsnowinginseattle.org). It's a silly site and shouldn't be taken too seriously.
 
 ## Weather conditions
