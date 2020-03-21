@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -26,18 +27,21 @@ func ReadConf() Config {
 		log.Fatalln(err)
 	}
 	defer f.Close()
-	cfg := ParseConf(f)
+	cfg, err := ParseConf(f)
+	if err != nil {
+		log.Fatalf("read config: %v", err)
+	}
 	return cfg
 }
 
 // ParseConf parses the YAML configuration data in r.
-func ParseConf(r io.Reader) Config {
+func ParseConf(r io.Reader) (Config, error) {
 	var cfg Config
 	decoder := yaml.NewDecoder(r)
 	err := decoder.Decode(&cfg)
 	if err != nil {
-		log.Fatalf("decode config.yml: %v", err.Error())
+		err = fmt.Errorf("decode: %w", err)
 	}
 
-	return cfg
+	return cfg, err
 }
